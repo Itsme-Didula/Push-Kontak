@@ -69,6 +69,10 @@ module.exports = rezadevv = async (client, m, chatUpdate, store) => {
     const pushname = m.pushName || "No Name";
     const itsMe = m.sender == botNumber ? true : false;
     let text = (q = args.join(" "));
+    const fatkuns = (m.quoted || m)
+    const quoted = (fatkuns.mtype == 'buttonsMessage') ? fatkuns[Object.keys(fatkuns)[1]] : (fatkuns.mtype == 'templateMessage') ? fatkuns.hydratedTemplate[Object.keys(fatkuns.hydratedTemplate)[1]] : (fatkuns.mtype == 'product') ? fatkuns[Object.keys(fatkuns)[0]] : m.quoted ? m.quoted : m
+    const mime = (quoted.msg || quoted).mimetype || ''
+    const qmsg = (quoted.msg || quoted)
     const arg = budy.trim().substring(budy.indexOf(" ") + 1);
     const arg1 = arg.trim().substring(arg.indexOf(" ") + 1);
 
@@ -117,7 +121,7 @@ module.exports = rezadevv = async (client, m, chatUpdate, store) => {
             }
           }
           await client.sendMessage(sender, reactionMessage);
-          text = `╭──❒ *All MENU BOT*\n├• 📌 ${prefix}pushkontak [text]\n├• 📌 ${prefix}setdelay [time]\n├• 📌 ${prefix}pushid [idgroup]|[text]\n├• 📌 ${prefix}savekontak [idgroup]\n├• 📌 ${prefix}getidgc\n└────────────>\n\n*_Delay Set: ${getDelay()}_*`
+          text = `╭──❒ *All MENU BOT*\n├• 📌 ${prefix}pushkontak [text]\n├• 📌 ${prefix}setdelay [time]\n├• 📌 ${prefix}pushimg [idgc|caption](Reply Gambar)\n├• 📌 ${prefix}pushid [idgroup]|[text]\n├• 📌 ${prefix}savekontak [idgroup]\n├• 📌 ${prefix}getidgc\n└────────────>\n\n*_Delay Set: ${getDelay()}_*`
           client.sendText(from, text, m)
         }
         break;
@@ -172,6 +176,47 @@ module.exports = rezadevv = async (client, m, chatUpdate, store) => {
 
             fs.writeFileSync('./src/delay.json', JSON.stringify(delayArray, null, 2));
             m.reply(`*_Sukses Setting Delay ${text}_*`);
+          }
+        }
+        break;
+        case "pushimg" : {
+          if (!isCreator) return m.reply(mess.owner)
+          let idgc = text.split("|")[0]
+          let caption = text.split("|")[1]
+          if (!idgc && !caption) return m.reply(`Example: ${prefix + command} idgc|pesan`)
+          if (/image/.test(mime)) {
+            let media = await quoted.download()
+            let metaDATA = await client.groupMetadata(idgc).catch((e) => {m.reply(e)})
+            let getDATA = await metaDATA.participants.filter(v => v.id.endsWith('.net')).map(v => v.id);
+            let count = getDATA.length;
+            let sentCount = 0;
+            const reactionMessage = {
+              react: {
+                text: "🕓", // use an empty string to remove the reaction
+                key: m.key
+              }
+            }
+            await client.sendMessage(sender, reactionMessage);
+            m.reply('*_Sedang Push Img..._*')
+            for (let i = 0; i < getDATA.length; i++) {
+              setTimeout(function() {
+                client.sendImage(getDATA[i], media, caption)
+                count--;
+                sentCount++;
+                if (count === 0) {
+                  const reactionMessage = {
+                    react: {
+                      text: "✅", // use an empty string to remove the reaction
+                      key: m.key
+                    }
+                  }
+                  client.sendMessage(sender, reactionMessage);
+                  m.reply(`*_Semua pesan telah dikirim!_*:\n*_Jumlah pesan terkirim:_* *_${sentCount}_*`);
+                }
+              }, i * getDelay());
+            }
+          } else {
+            m.reply(`Reply gambar dengan caption ${prefix}pushimg idgc|pesan`)
           }
         }
         break;

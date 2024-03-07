@@ -11,6 +11,7 @@
 ╭──❒ <b>All MENU BOT</b><br>
 ├• 📌 #pushkontak [text]<br>
 ├• 📌 #setdelay [time]<br>
+├• 📌 #pushimg [idgc|caption](Reply Gambar)<br>
 ├• 📌 #pushid [idgroup]|[text]<br>
 ├• 📌 #savekontak [idgroup]<br>
 ├• 📌 #getidgc<br>
