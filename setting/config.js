@@ -1,8 +1,8 @@
 const fs = require("fs");
 const chalk = require("chalk");
 
-global.owner = ["6285742632270"];
-global.author = "RezaDevv";
+global.owner = ["94741671668"];
+global.author = "Didula Rashmika";
 global.packname = "Push-Kontak";
 global.sessionName = "Bot-Session";
 global.versionbot = "1.3.0";
